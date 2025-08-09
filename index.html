@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🌙 Mood & Sleep Journal</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #6dd5ed, #2193b0);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: rgba(0,0,0,0.6);
+    padding: 2em;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1em;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 1em;
+  }
+  select, input, textarea, button {
+    width: 100%;
+    padding: 0.6em;
+    margin-top: 0.5em;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  textarea {
+    resize: vertical;
+  }
+  button {
+    background-color: #00c6ff;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background-color: #0072ff;
+  }
+  pre {
+    background: rgba(255,255,255,0.1);
+    padding: 1em;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    margin-top: 1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🌙 Mood & Sleep Journal</h1>
+
+  <label for="mainThought">What's on your mind today?</label>
+  <textarea id="mainThought" rows="4" placeholder="Describe your day..."></textarea>
+
+  <label for="sleep">How many hours did you sleep?</label>
+  <input type="number" id="sleep" min="0" max="24" step="0.5" placeholder="e.g. 7.5" />
+
+  <label for="mood">Choose your mood:</label>
+  <select id="mood" onchange="changeBackground()">
+    <option value="#FFD700">😊 Happy</option>
+    <option value="#ADD8E6">😌 Calm</option>
+    <option value="#FF6347">😠 Stressed</option>
+    <option value="#9370DB">😔 Sad</option>
+    <option value="#90EE90">😃 Energetic</option>
+  </select>
+
+  <button onclick="generateSummary()">Generate Mood Summary</button>
+  <button onclick="downloadEntry()">📥 Download Entry</button>
+
+  <h2>Summary:</h2>
+  <pre id="result">No summary yet.</pre>
+</div>
+
+<script>
+function changeBackground() {
+  const moodColor = document.getElementById("mood").value;
+  document.body.style.background = `linear-gradient(120deg, ${moodColor}, #000000)`;
+}
+
+function sleepQuality(hours) {
+  if (hours >= 8) return "Excellent sleep — your mind is fully recharged.";
+  if (hours >= 6) return "Moderate sleep — you're doing okay, but rest more.";
+  return "Low sleep — your body may need extra care today.";
+}
+
+function generateSummary() {
+  const thought = document.getElementById("mainThought").value.trim();
+  const sleep = parseFloat(document.getElementById("sleep").value);
+  const mood = document.getElementById("mood").options[document.getElementById("mood").selectedIndex].text;
+
+  if (!thought || isNaN(sleep)) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const quality = sleepQuality(sleep);
+  const summary = `Today, you felt ${mood.toLowerCase()} and expressed: "${thought}".
+You had ${sleep} hours of sleep. ${quality}
+Remember to stay hydrated, breathe deeply, and give yourself kindness. 🌟`;
+
+  document.getElementById("result").textContent = summary;
+}
+
+function downloadEntry() {
+  const summaryText = document.getElementById("result").textContent;
+  if (summaryText === "No summary yet.") {
+    alert("Please generate a summary first.");
+    return;
+  }
+  const blob = new Blob([summaryText], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `journal-${new Date().toISOString().slice(0,10)}.txt`;
+  link.click();
+}
+</script>
+
+</body>
+</html>
